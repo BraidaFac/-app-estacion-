@@ -10,7 +10,6 @@
 	import { createSearchStore, searchHandler } from '../../stores/stores';
 	import type { Writable } from 'svelte/store';
 	import UpdatePrice from '../../components/updatePrice.svelte';
-
 	const searchProducts: Product[] = data.products.map((product: Product) => ({
 		...product,
 		searchTerms: `${product.id} ${product.price[0].price} ${product.brand.name} ${product.category.name}`
@@ -57,7 +56,7 @@
 </div>
 {#if filter}
 	<div class="filters">
-		<form use:enhance on:submit|preventDefault={filt}>
+		<form on:submit|preventDefault={filt}>
 			<label for="category">Categoria</label>
 			<select name="category" id="category">
 				<option selected value="">Todos</option>
@@ -106,6 +105,9 @@
 {/if}
 {#if flagUpdate}
 	<UpdatePrice on:close={close} {searchStore} product={updateProd} />
+{/if}
+{#if !data}
+	<p>Cargando</p>
 {/if}
 
 <style lang="scss">

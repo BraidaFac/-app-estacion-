@@ -45,7 +45,7 @@ model AuthKey {
 }
 
 model Product {
-  id String @id @map("_id") 
+  id String @id @map("_id")
   price Price[]
   description String?
   category_id  String @db.ObjectId
