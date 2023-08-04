@@ -11,7 +11,6 @@ export const POST = async ({ request }) => {
 	try {
 		const responseObj: { error?: string; status: number } = { status: 200 };
 		const data = await request.json();
-		console.log(data);
 		const array_data: Array<Array<lotusFormat>> = [...data];
 		for (const sheet of array_data) {
 			for (const product of sheet) {
@@ -37,9 +36,15 @@ export const POST = async ({ request }) => {
 					if (category.length === 0 || brand.length === 0) {
 						responseObj.error = 'No se encontró la categoría o marca.';
 						responseObj.status = 400;
+						return new Response(JSON.stringify(responseObj), {
+							status: responseObj.status || 400
+						});
 					} else if (category.length !== 1 || brand.length !== 1) {
 						responseObj.error = 'Coincide con dos marcas.';
 						responseObj.status = 400;
+						return new Response(JSON.stringify(responseObj), {
+							status: responseObj.status || 400
+						});
 					} else {
 						await prismaClient.product.upsert({
 							where: {

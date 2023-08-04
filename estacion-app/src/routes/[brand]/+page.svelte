@@ -1,15 +1,14 @@
 <script lang="ts">
 	import type { ActionData, PageData } from './$types';
 	export let data: PageData;
-	import type { Product } from '../../types';
+	import type { Category, Product } from '../../types';
 	import { enhance } from '$app/forms';
 	import { onDestroy } from 'svelte';
-	const categories = data.categories;
-	const brands = data.brands;
 	const products = data.products as Product[];
 	import { createSearchStore, searchHandler } from '../../stores/stores';
 	import type { Writable } from 'svelte/store';
 	import UpdatePrice from '$lib/components/updatePrice.svelte';
+	const categories = data.categories as Category[];
 	const searchProducts: Product[] = data.products.map((product: Product) => ({
 		...product,
 		searchTerms: `${product.id} ${product.price[0].price} ${product.brand.name} ${product.category.name}`
@@ -62,13 +61,6 @@
 				<option selected value="">Todos</option>
 				{#each categories as cat (cat.id)}
 					<option value={cat.name}>{cat.name}</option>
-				{/each}
-			</select>
-			<label for="brand">Marca</label>
-			<select name="brand" id="brand">
-				<option selected value="">Todos</option>
-				{#each brands as brand (brand.id)}
-					<option value={brand.name}>{brand.name}</option>
 				{/each}
 			</select>
 			<button type="submit">Filtrar</button>

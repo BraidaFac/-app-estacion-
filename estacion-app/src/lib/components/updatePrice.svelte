@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import type { Product } from '../types';
-	import { searchHandler } from '../stores/stores';
+	import type { Product } from '../../types';
 	import type { Writable } from 'svelte/store';
-	import type { SearchStoreModel } from '../stores/stores';
+	import type { SearchStoreModel } from '../../stores/stores';
 
 	export let product: Product;
 	export let searchStore: Writable<SearchStoreModel<Product>>;
-
+	let disabled: boolean = true;
+	let newPrice: string = product.price[0].price.toString();
+	$: disabled = parseInt(newPrice) === product.price[0].price;
 	const dispatch = createEventDispatcher();
+
 	function close() {
 		dispatch('close');
 	}
@@ -49,34 +51,56 @@
 	}
 </script>
 
-<div class="formPrice">
-	<a href="/" on:click|preventDefault={close}>X</a>
-	<form on:submit|preventDefault={submit}>
-		<label for="price">Articulo {product.id}</label>
-		<input name="price" id="price" type="number" value={product.price[0].price} />
-		<div>
-			<button type="submit">Enviar</button>
-		</div>
-	</form>
-</div>
+<article>
+	<div class="formPrice">
+		<a href="/" on:click|preventDefault={close}>X</a>
+		<form on:submit|preventDefault={submit}>
+			<label for="price">Articulo {product.id}</label>
+			<input
+				placeholder={product.price[0].price.toString()}
+				bind:value={newPrice}
+				name="price"
+				id="price"
+				type="number"
+			/>
+			{#if disabled}
+				<span style=" display:block; color:red; font-size:small">Tiene el mismo precio</span>
+			{/if}
+			<div>
+				<button {disabled} type="submit">Enviar</button>
+			</div>
+		</form>
+	</div>
+</article>
 
 <style lang="scss">
+	article {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 30%;
+		background-color: rgba(95, 177, 255, 0.824);
+		padding: 1rem;
+		border-radius: 5px;
+		box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+		z-index: 10;
+	}
 	.formPrice {
-		margin: 60px auto;
 		border-radius: 10px;
 		padding: 5px;
-		width: 400px;
 		display: flex;
+		justify-content: center;
 		flex-direction: column;
 		align-items: center;
-		background-color: rgb(159, 17, 17);
+		height: 100%;
 		input {
 			width: 200px;
-			border-color: rgb(206, 199, 199);
 		}
 		a {
 			font-size: xx-large;
 			align-self: flex-end;
+			justify-self: flex-start;
 		}
 		button {
 			margin-top: 10px;
