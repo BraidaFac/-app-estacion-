@@ -28,6 +28,11 @@ export const load: PageServerLoad = (async ({ params, locals }) => {
 				brand: {
 					select: { name: true }
 				}
+			},
+			orderBy: {
+				category: {
+					name: 'asc'
+				}
 			}
 		})) as Product[],
 		categories: await prismaClient.category.findMany()

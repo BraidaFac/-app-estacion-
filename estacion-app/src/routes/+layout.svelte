@@ -48,10 +48,14 @@
 		</details>
 	</div>
 </nav>
-
-<slot />
+<div class="main">
+	<slot />
+</div>
 
 <style lang="scss">
+	.main {
+		padding: 15px;
+	}
 	.navbar {
 		width: 100%;
 		height: 80px;

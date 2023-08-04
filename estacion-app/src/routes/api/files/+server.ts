@@ -8,89 +8,15 @@ type lotusFormat = {
 	description?: string;
 };
 export const POST = async ({ request }) => {
+	const responseObj: { error: string[]; status: number } = { error: [], status: 200 };
 	try {
-		const responseObj: { error?: string; status: number } = { status: 200 };
 		const data = await request.json();
 		const array_data: Array<Array<lotusFormat>> = [...data];
 		for (const sheet of array_data) {
-			for (const product of sheet) {
-				console.log(product);
-				try {
-					const category = await prismaClient.category.findMany({
-						where: {
-							name: {
-								contains: product.category.toLowerCase(),
-								mode: 'insensitive'
-							}
-						}
-					});
-					const brand = await prismaClient.brand.findMany({
-						where: {
-							name: {
-								contains: product.brand.toLowerCase(),
-								mode: 'insensitive'
-							}
-						}
-					});
-
-					if (category.length === 0 || brand.length === 0) {
-						responseObj.error = 'No se encontró la categoría o marca.';
-						responseObj.status = 400;
-						return new Response(JSON.stringify(responseObj), {
-							status: responseObj.status || 400
-						});
-					} else if (category.length !== 1 || brand.length !== 1) {
-						responseObj.error = 'Coincide con dos marcas.';
-						responseObj.status = 400;
-						return new Response(JSON.stringify(responseObj), {
-							status: responseObj.status || 400
-						});
-					} else {
-						await prismaClient.product.upsert({
-							where: {
-								id: product.id
-							},
-							update: {
-								price: {
-									updateMany: {
-										where: {
-											current_price: true
-										},
-										data: {
-											current_price: false
-										}
-									},
-									create: {
-										price: Number(product.price),
-										date: new Date().toISOString(),
-										current_price: true
-									}
-								}
-							},
-							create: {
-								id: product.id,
-								price: {
-									create: {
-										price: Number(product.price),
-										date: new Date().toISOString(),
-										current_price: true
-									}
-								},
-								category_id: category[0].id,
-								brand_id: brand[0].id,
-								description: product?.description ?? 'No tiene'
-							}
-						});
-					}
-				} catch (err) {
-					console.log(err);
-					responseObj.error = 'Prisma error';
-					responseObj.status = 404;
-				}
-			}
+			await processSheet(sheet, responseObj);
 		}
 		return new Response(JSON.stringify(responseObj), {
-			status: responseObj.status || 200
+			status: responseObj.error.length === 0 ? 200 : 404
 		});
 	} catch (err) {
 		console.log(err);
@@ -99,23 +25,72 @@ export const POST = async ({ request }) => {
 		});
 	}
 };
-/* function readExcelFile(filePath: string): ExcelRow<any>[] {
-	const workbook = XLSX.readFile(filePath);
-	const sheetName = workbook.SheetNames[0];
-	const worksheet = workbook.Sheets[sheetName];
+async function processSheet(
+	sheet: lotusFormat[],
+	responseObj: { error: string[]; status: number }
+) {
+	for (let i = 0; i < sheet.length; i++) {
+		try {
+			const row = sheet[i];
+			const brand = await prismaClient.brand.findMany({
+				where: { name: { contains: row.brand.toLowerCase(), mode: 'insensitive' } },
+				select: { id: true }
+			});
+			const category = await prismaClient.category.findMany({
+				where: { name: { contains: row.category.toLowerCase(), mode: 'insensitive' } },
+				select: { id: true }
+			});
+			if (brand.length === 0 || brand.length > 1) {
+				responseObj.error.push(`Error:: Marca de la fila ${i} no coincide con ninguna marca.`);
+				responseObj.status = 404;
+				continue;
+			} else if (category.length === 0 || category.length > 1) {
+				responseObj.error.push(
+					`Error:: Categoria de la fila ${i} no coincide con ninguna categoria.`
+				);
+				responseObj.status = 404;
 
-	const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-	const headers = rows.shift();
-	console.log(headers);
-	console.log(rows);
-	const typedRows: ExcelRow<any>[] = rows.map((row) => {
-		const rowObject: ExcelRow<any> = {};
-		headers.forEach((header: string, index: number) => {
-			rowObject[header] = row[index];
-		});
-		return rowObject;
-	});
-	console.log(typedRows);
-
-	return typedRows;
-} */
+				continue;
+			} else {
+				await prismaClient.product.upsert({
+					where: {
+						id: row.id
+					},
+					update: {
+						price: {
+							updateMany: {
+								where: {
+									current_price: true
+								},
+								data: {
+									current_price: false
+								}
+							},
+							create: {
+								price: Number(row.price),
+								date: new Date().toISOString(),
+								current_price: true
+							}
+						}
+					},
+					create: {
+						id: row.id,
+						price: {
+							create: {
+								price: Number(row.price),
+								date: new Date().toISOString(),
+								current_price: true
+							}
+						},
+						category_id: category[0].id,
+						brand_id: brand[0].id,
+						description: row?.description ?? 'No tiene'
+					}
+				});
+			}
+		} catch (err) {
+			responseObj.error.push('Prisma error');
+			responseObj.status = 404;
+		}
+	}
+}

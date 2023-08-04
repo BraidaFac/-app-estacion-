@@ -16,7 +16,7 @@
 	let category_id: string = '';
 	let brand_id: string = '';
 	let percent: string = '';
-	$: loading = false;
+	let loading = false;
 	async function submit() {
 		if (parseInt(percent) > 100) {
 			error = true;

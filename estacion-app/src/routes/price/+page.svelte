@@ -112,6 +112,8 @@
 {/if}
 
 <style lang="scss">
+	$layout-breakpoint-big: 1050px;
+
 	.overlay {
 		position: absolute;
 		top: 0;
@@ -132,15 +134,19 @@
 	}
 	.list {
 		margin-top: 50px;
-		table {
-			th {
-				text-align: center;
-				color: rgb(159, 16, 16);
-				width: 350px;
-			}
-			td {
-				text-align: center;
-				width: 350px !important;
+
+		@media (min-width: $layout-breakpoint-big) {
+			table {
+				width: 1000px !important;
+				th {
+					text-align: center;
+					color: rgb(159, 16, 16);
+					width: 200px !important;
+				}
+				td {
+					text-align: center;
+					width: 200px !important;
+				}
 			}
 		}
 	}

@@ -28,9 +28,7 @@
 		if (e.target) {
 			const data = new FormData(e.target as HTMLFormElement);
 			const category = data.get('category') as string;
-			const brand = data.get('brand') as string;
 			$searchStore.category = `${category}`;
-			$searchStore.brand = `${brand}`;
 		}
 	}
 	let updateProd: Product;
