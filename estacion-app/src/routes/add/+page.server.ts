@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from '../$types';
+import type { PageServerLoad, Actions } from '../price/$types';
 import { prismaClient } from '$lib/server/prisma';
 
 export const load: PageServerLoad = (async ({ locals }) => {
@@ -22,7 +22,6 @@ export const actions: Actions = {
 		} catch (err) {
 			return JSON.stringify(err);
 		}
-		throw redirect(304, '/price');
 	},
 	product: async ({ request }) => {
 		const { id, price, category_id, brand_id, description } = Object.fromEntries(
@@ -46,7 +45,6 @@ export const actions: Actions = {
 					description
 				}
 			});
-			redirect(304, '/');
 		} catch (err) {
 			console.log(err);
 			return {};
@@ -67,6 +65,5 @@ export const actions: Actions = {
 		} catch (err) {
 			console.log(JSON.stringify(err));
 		}
-		throw redirect(304, '/price');
 	}
 };

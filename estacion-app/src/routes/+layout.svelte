@@ -10,16 +10,11 @@
 		<a href="/">La estacion</a>
 	</div>
 	{#if data.user}
-		<div class="opt-menu">
-			<details class="menu" role="list">
-				<summary aria-haspopup="listbox" class=""> Opciones </summary>
-				<ul role="listbox">
-					<li><a href="/price">Precios</a></li>
-					<li><a href="/">Modificar articulos</a></li>
-					<li><a href="/">Agregar lista de articulos</a></li>
-				</ul>
-			</details>
-		</div>
+		<ul>
+			<li><a href="/add">Nuevo</a></li>
+			<li><a href="/files">Excel</a></li>
+			<li><a href="/price/upprice">Actualizar precios</a></li>
+		</ul>
 	{/if}
 	<div class="usr-menu">
 		{#if data.user}

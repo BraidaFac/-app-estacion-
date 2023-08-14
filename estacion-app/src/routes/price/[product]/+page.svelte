@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	export let data: PageData;
-	import type { Price } from '@prisma/client';
 	const prices = data.prices;
 	const product = data.product;
 </script>
@@ -24,7 +23,7 @@
 			{/each}
 		</tbody>
 	</table>
-	<a role="button" href="/price">Volver a la lista</a>
+	<a role="button" href="/">Volver a la lista</a>
 </div>
 
 <style lang="scss">

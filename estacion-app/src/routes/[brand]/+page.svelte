@@ -2,11 +2,9 @@
 	import type { ActionData, PageData } from './$types';
 	export let data: PageData;
 	import type { Category, Product } from '../../types';
-	import { enhance } from '$app/forms';
 	import { onDestroy } from 'svelte';
 	const products = data.products as Product[];
 	import { createSearchStore, searchHandler } from '../../stores/stores';
-	import type { Writable } from 'svelte/store';
 	import UpdatePrice from '$lib/components/updatePrice.svelte';
 	const categories = data.categories as Category[];
 	const searchProducts: Product[] = data.products.map((product: Product) => ({
@@ -20,15 +18,10 @@
 		unsubscribe();
 	});
 
-	let filter: Boolean = false;
-	function enable() {
-		filter = !filter;
-	}
-	function filt(e: Event) {
-		if (e.target) {
-			const data = new FormData(e.target as HTMLFormElement);
-			const category = data.get('category') as string;
-			$searchStore.category = `${category}`;
+	let filterCategory: string = '';
+	function filt() {
+		{
+			$searchStore.category = `${filterCategory}`;
 		}
 	}
 	let updateProd: Product;
@@ -45,26 +38,18 @@
 </script>
 
 <div class="grid">
-	<div><a role="button" href="/price/add">Agregar</a></div>
+	<div class="filters">
+		<select bind:value={filterCategory} on:change={filt} name="category" id="category">
+			<option selected value="">Todos</option>
+			{#each categories as cat (cat.id)}
+				<option value={cat.name}>{cat.name}</option>
+			{/each}
+		</select>
+	</div>
 	<div>
-		<a href="/" role="button" on:click|preventDefault={enable}>Filtros</a>
 		<input type="search" placeholder="Search..." bind:value={$searchStore.search} />
 	</div>
 </div>
-{#if filter}
-	<div class="filters">
-		<form on:submit|preventDefault={filt}>
-			<label for="category">Categoria</label>
-			<select name="category" id="category">
-				<option selected value="">Todos</option>
-				{#each categories as cat (cat.id)}
-					<option value={cat.name}>{cat.name}</option>
-				{/each}
-			</select>
-			<button type="submit">Filtrar</button>
-		</form>
-	</div>
-{/if}
 {#if true}
 	<div class="list" class:hidden={flagUpdate}>
 		<table data-sveltekit-reload role="grid">
@@ -84,7 +69,9 @@
 						<td>{prod.category.name}</td>
 						<td>{prod.brand.name}</td>
 						<td
-							><a href="/" on:click|preventDefault={update(prod.id)}> ${prod.price[0].price}</a></td
+							><a href="/" on:click|preventDefault={update(prod.id)}>
+								${prod.price[0].price.toFixed(2)}</a
+							></td
 						>
 						<td><a href={`/price/${prod.id}`}>Precios</a></td>
 					</tr>
@@ -135,25 +122,10 @@
 		}
 	}
 	.filters {
-		width: 100%;
+		width: 50%;
 		display: block;
 		position: relative;
 		text-align: center;
-
-		div {
-			padding: 5px;
-		}
-		form {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 40%;
-			margin: auto;
-		}
-		button {
-			margin-top: 12px;
-			margin-bottom: 0px;
-		}
 	}
 	.hidden {
 		display: none;
