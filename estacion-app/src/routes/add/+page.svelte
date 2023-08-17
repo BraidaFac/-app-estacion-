@@ -28,8 +28,8 @@
 	</div>
 	<div class="">
 		<form action="?/product" method="POST">
-			<label for="id_product">Articulo</label>
-			<input type="text" name="id_product" id="id_product" />
+			<label for="article">Articulo</label>
+			<input type="text" name="article" id="article" />
 			<label for="name">Nombre</label>
 			<input type="text" name="name" id="name" />
 			<select name="category_id">

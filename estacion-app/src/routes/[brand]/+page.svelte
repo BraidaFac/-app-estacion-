@@ -57,6 +57,7 @@
 				<tr>
 					<th>Articulo</th>
 					<th>Categoria</th>
+					<th>Desripcion</th>
 					<th>Marca</th>
 					<th>Precio</th>
 					<th>Historial Precios</th>
@@ -65,8 +66,9 @@
 			<tbody>
 				{#each $searchStore.filtered as prod (prod.id)}
 					<tr>
-						<td>{prod.id}</td>
+						<td>{prod.article}</td>
 						<td>{prod.category.name}</td>
+						<td>{prod.description}</td>
 						<td>{prod.brand.name}</td>
 						<td
 							><a href="/" on:click|preventDefault={update(prod.id)}>

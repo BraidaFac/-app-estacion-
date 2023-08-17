@@ -5,10 +5,17 @@
 	import type { Product } from '../../types';
 	import RingLoader from 'svelte-loading-spinners/RingLoader.svelte';
 
+	type Format = {
+		MARCA: string;
+		ARTICULO?: string;
+		CATEGORIA: string;
+		DESCRIPCION?: string;
+		PRECIO: string | number;
+	};
 	let loading: boolean = false;
 
 	function submit(event: Event) {
-		const json_data: unknown[] = [];
+		const json_data: [Format[]] = [[]];
 
 		if (!event.target) {
 		} else {
@@ -29,10 +36,9 @@
 					let workbook = XLSX.read(binaryData, { type: 'binary' });
 					workbook.SheetNames.forEach((sheet) => {
 						json_data.push(
-							XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 3, range: 2 })
+							XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 2, range: 1 }) as Format[]
 						);
 					});
-					const json_object = [...json_data];
 					try {
 						loading = true;
 						fetch('/api/files', {
@@ -40,18 +46,15 @@
 							headers: {
 								'Content-Type': 'application/json'
 							},
-							body: JSON.stringify(json_object)
+							body: JSON.stringify(json_data)
 						})
 							.then((res) => res.json())
 							.then((res) => {
-								console.log(res.status);
 								if (res.status === 200) {
 									loading = false;
 									alert('Precio actualizado');
 								} else if (res.status === 404) {
-									res.error.forEach((error: string) => {
-										alert(error);
-									});
+									alert(res.error.join('\n'));
 									loading = false;
 								}
 							});

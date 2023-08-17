@@ -45,7 +45,8 @@ model AuthKey {
 }
 
 model Product {
-  id String @id @map("_id")
+  id String @id @map("_id")@default(auto()) @db.ObjectId
+  article String? @unique
   price Price[]
   description String?
   category_id  String @db.ObjectId
@@ -74,7 +75,7 @@ model Brand {
 
 model Price {
   id String @id @map("_id") @default(auto()) @db.ObjectId
-  product_id String
+  product_id String  @db.ObjectId
   product Product @relation(references: [id], fields: [product_id], onDelete: Cascade)
   price Float
   date DateTime

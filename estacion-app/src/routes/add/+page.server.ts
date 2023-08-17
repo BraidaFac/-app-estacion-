@@ -24,10 +24,10 @@ export const actions: Actions = {
 		}
 	},
 	product: async ({ request }) => {
-		const { id, price, category_id, brand_id, description } = Object.fromEntries(
+		const { article, price, category_id, brand_id, description } = Object.fromEntries(
 			await request.formData()
 		) as {
-			id: string;
+			article: string;
 			price: string;
 			category_id: string;
 			brand_id: string;
@@ -36,7 +36,7 @@ export const actions: Actions = {
 		try {
 			await prismaClient.product.create({
 				data: {
-					id,
+					article,
 					price: {
 						create: { price: Number(price), date: Date(), current_price: true }
 					},
