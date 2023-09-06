@@ -142,6 +142,7 @@
 					text-align: center;
 					color: rgb(159, 16, 16);
 					width: 200px !important;
+					font
 				}
 				td {
 					text-align: center;
@@ -170,7 +171,7 @@
 			margin-top: 12px;
 			margin-bottom: 0px;
 		}
-	}
+	}	/*
 	.hidden {
 		display: none;
 	}

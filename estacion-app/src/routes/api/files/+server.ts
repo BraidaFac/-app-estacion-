@@ -9,13 +9,17 @@ type Format = {
 };
 const brands = await prismaClient.brand.findMany();
 const categories = await prismaClient.category.findMany();
+const products = await prismaClient.product.findMany();
+const newProducts: Format[] = [];
+const oldProducts: Format[] = [];
 export const POST = async ({ request }) => {
 	const responseObj: { error: string[]; status: number } = { error: [], status: 200 };
 	try {
 		const data = await request.json();
 		const array_data: Array<Array<Format>> = [...data];
 		for (const sheet of array_data) {
-			await processSheet(sheet, responseObj);
+			console.log(searchNewProduct(sheet));
+			await processOldProducts(oldProducts, responseObj);
 		}
 		return new Response(JSON.stringify(responseObj), {
 			status: responseObj.error.length === 0 ? 200 : 404
@@ -26,11 +30,25 @@ export const POST = async ({ request }) => {
 		});
 	}
 };
-async function processSheet(sheet: Format[], responseObj: { error: string[]; status: number }) {
+
+function searchNewProduct(sheet: Format[]): Format[] {
+	sheet.forEach((row) => {
+		const product = products.find((product) => product.article === row.ARTICULO?.toString());
+		if (product) {
+			oldProducts.push(row);
+			return;
+		}
+		newProducts.push(row);
+	});
+	return newProducts;
+}
+async function processOldProducts(
+	sheet: Format[],
+	responseObj: { error: string[]; status: number }
+) {
 	for (let i = 0; i < sheet.length; i++) {
 		try {
 			const row = sheet[i];
-
 			const category = categories.find(
 				(cat) => cat.name.toLowerCase() === row.CATEGORIA.toLowerCase()
 			);
@@ -45,11 +63,11 @@ async function processSheet(sheet: Format[], responseObj: { error: string[]; sta
 				responseObj.status = 404;
 				break;
 			} else {
-				await prismaClient.product.upsert({
+				await prismaClient.product.update({
 					where: {
-						article: row.ARTICULO ? row.ARTICULO.toString() : ''
+						article: row.ARTICULO ? row.ARTICULO.toString() : '-'
 					},
-					update: {
+					data: {
 						price: {
 							updateMany: {
 								where: {
@@ -65,19 +83,6 @@ async function processSheet(sheet: Format[], responseObj: { error: string[]; sta
 								current_price: true
 							}
 						}
-					},
-					create: {
-						article: row.ARTICULO ? row.ARTICULO.toString() : '',
-						price: {
-							create: {
-								price: Number(row.PRECIO),
-								date: new Date().toISOString(),
-								current_price: true
-							}
-						},
-						category_id: category.id,
-						brand_id: brand.id,
-						description: row?.DESCRIPCION ?? 'No tiene'
 					}
 				});
 			}
