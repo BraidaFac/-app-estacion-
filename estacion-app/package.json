@@ -42,6 +42,7 @@
 		"formidable-serverless": "^1.1.1",
 		"lucia-auth": "^1.8.0",
 		"multer": "^1.4.5-lts.1",
+		"read-excel-file": "^5.6.1",
 		"rollup-plugin-postcss": "^4.0.2",
 		"svelte-spinkit": "^1.0.3",
 		"xlsx": "^0.18.5",

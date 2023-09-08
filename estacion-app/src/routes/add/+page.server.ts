@@ -38,7 +38,7 @@ export const actions: Actions = {
 				data: {
 					article,
 					price: {
-						create: { price: Number(price), date: Date(), current_price: true }
+						create: { price: Number(price), date: new Date().toISOString(), current_price: true }
 					},
 					category_id,
 					brand_id,
