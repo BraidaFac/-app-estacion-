@@ -1,17 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { unknown } from 'zod';
-	import * as XLSX from 'xlsx';
-	import type { Product } from '../../types';
 	import RingLoader from 'svelte-loading-spinners/RingLoader.svelte';
 
-	type Format = {
-		MARCA: string;
-		ARTICULO?: string;
-		CATEGORIA: string;
-		DESCRIPCION?: string;
-		PRECIO: string | number;
-	};
+	$: file = null;
 	let loading: boolean = false;
 </script>
 
@@ -21,19 +12,25 @@
 		<form
 			method="post"
 			use:enhance={() => {
+				loading = true;
 				return async ({ result, update }) => {
 					if (result.status === 200) {
 						update();
+						loading = false;
 						alert('Archivo subido correctamente');
+					} else {
+						loading = false;
+						const errors = result.data.error.error.join('\n');
+						alert(errors + '\n' + 'Intente nuevamente');
 					}
 				};
 			}}
 			enctype="multipart/form-data"
 		>
 			<label for="file">Archivo</label>
-			<input type="file" name="file" id="file" accept=".xlsx, .xls" />
+			<input bind:value={file} type="file" name="file" id="file" accept=".xlsx, .xls" />
 			<div>
-				<button type="submit">Agregar</button>
+				<button disabled={!file} type="submit">Agregar</button>
 			</div>
 		</form>
 	</div>
@@ -45,6 +42,15 @@
 {/if}
 
 <style lang="scss">
+	.overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 100;
+	}
 	.files-form {
 		display: flex;
 		flex-direction: column;
@@ -52,6 +58,7 @@
 		justify-content: center;
 	}
 	.spinner {
+		z-index: 1000;
 		position: absolute;
 		top: 50%;
 		left: 50%;

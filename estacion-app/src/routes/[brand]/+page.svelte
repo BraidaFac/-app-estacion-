@@ -1,57 +1,59 @@
 <script lang="ts">
 	import type { ActionData, PageData } from './$types';
-	export let data: PageData;
 	import type { Category, Product } from '../../types';
 	import { onDestroy } from 'svelte';
-	const products = data.products as Product[];
 	import { createSearchStore, searchHandler } from '../../stores/stores';
 	import UpdatePrice from '$lib/components/updatePrice.svelte';
+
+	//props
+	export let data: PageData;
+
+	//variables
+	const products = data.products;
 	const categories = data.categories as Category[];
-	const searchProducts: Product[] = data.products.map((product: Product) => ({
+	const searchProducts = data.products.map((product: Product) => ({
 		...product,
-		searchTerms: `${product.id} ${product.price[0].price} ${product.brand.name} ${product.category.name}`
+		searchTerms: `${product.article} ${product.description} ${product.category.name}`
 	}));
 	export const searchStore = createSearchStore(searchProducts);
+	let filterCategory: string = '';
+	let show_new_form_modal = false;
+
+	$: updateProd = {} as Product;
+
+	//methods
 	const unsubscribe = searchStore.subscribe((model) => searchHandler(model));
 
 	onDestroy(() => {
 		unsubscribe();
 	});
 
-	let filterCategory: string = '';
 	function filt() {
 		{
 			$searchStore.category = `${filterCategory}`;
 		}
 	}
-	let updateProd: Product;
-	let flagUpdate: Boolean = false;
+
 	function update(id: string) {
 		return () => {
-			flagUpdate = !flagUpdate;
 			updateProd = products.find((prod) => prod.id === id) as Product;
+			show_new_form_modal = true;
 		};
-	}
-	function close() {
-		flagUpdate = !flagUpdate;
 	}
 </script>
 
-<div class="grid">
-	<div class="filters">
-		<select bind:value={filterCategory} on:change={filt} name="category" id="category">
-			<option selected value="">Todos</option>
-			{#each categories as cat (cat.id)}
-				<option value={cat.name}>{cat.name}</option>
-			{/each}
-		</select>
-	</div>
-	<div>
-		<input type="search" placeholder="Search..." bind:value={$searchStore.search} />
-	</div>
+<div class="filters">
+	<select bind:value={filterCategory} on:change={filt} name="category" id="category">
+		<option selected value="">Todos</option>
+		{#each categories as cat (cat.id)}
+			<option value={cat.name}>{cat.name}</option>
+		{/each}
+	</select>
+	<input type="search" placeholder="Buscar" bind:value={$searchStore.search} />
 </div>
+
 {#if true}
-	<div class="list" class:hidden={flagUpdate}>
+	<div class="list">
 		<table data-sveltekit-reload role="grid">
 			<thead>
 				<tr>
@@ -82,54 +84,38 @@
 		</table>
 	</div>
 {/if}
-{#if flagUpdate}
-	<UpdatePrice on:close={close} {searchStore} product={updateProd} />
-	<div class="overlay" />
-{/if}
-{#if !data}
-	<p>Cargando</p>
+{#if show_new_form_modal}
+	<UpdatePrice bind:show_new_form_modal {searchStore} product={updateProd} />
 {/if}
 
 <style lang="scss">
-	.overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(3px);
-		z-index: 5;
-	}
-	.grid {
-		div {
-			input {
-				width: 50%;
-				margin: auto;
-			}
-		}
-	}
-	.list {
-		margin-top: 50px;
-		table {
-			th {
-				text-align: center;
-				color: rgb(159, 16, 16);
-				width: 350px;
-			}
-			td {
-				text-align: center;
-				width: 350px !important;
-			}
-		}
-	}
 	.filters {
-		width: 50%;
-		display: block;
-		position: relative;
-		text-align: center;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		align-items: flex-start;
+		input {
+			width: 40%;
+		}
+		select {
+			width: 40%;
+			border-radius: 5rem;
+		}
 	}
-	.hidden {
-		display: none;
+
+	.list {
+		table {
+			tr {
+				th {
+					text-align: center;
+					color: rgb(159, 16, 16);
+					width: 302.5px;
+				}
+				td {
+					text-align: center;
+					width: 302.5px !important;
+				}
+			}
+		}
 	}
 </style>

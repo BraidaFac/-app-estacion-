@@ -1,10 +1,10 @@
-import { fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from '../price/$types';
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad, Actions } from './$types';
 import { prismaClient } from '$lib/server/prisma';
 
 export const load: PageServerLoad = (async ({ locals }) => {
 	const session = await locals.auth.validate();
-	if (!session) {
+	if (!session || session?.user.rol !== 'ADMIN') {
 		throw redirect(302, '/');
 	}
 	return {
@@ -13,6 +13,16 @@ export const load: PageServerLoad = (async ({ locals }) => {
 	};
 }) satisfies PageServerLoad;
 export const actions: Actions = {
+	category: async ({ request }) => {
+		const { name } = Object.fromEntries(await request.formData()) as {
+			name: string;
+		};
+		try {
+			await prismaClient.category.create({ data: { name } });
+		} catch (err) {
+			return JSON.stringify(err);
+		}
+	},
 	product: async ({ request }) => {
 		const { article, price, category_id, brand_id, description } = Object.fromEntries(
 			await request.formData()
@@ -35,9 +45,27 @@ export const actions: Actions = {
 					description
 				}
 			});
-			return { success: true };
 		} catch (err) {
-			return fail(501, { err });
+			console.log(err);
+			return {};
+		}
+	},
+	brand: async ({ request }) => {
+		const {
+			brand: name,
+			email,
+			phone,
+			url_img
+		} = Object.fromEntries(await request.formData()) as {
+			brand: string;
+			email: string;
+			phone: string;
+			url_img: string;
+		};
+		try {
+			await prismaClient.brand.create({ data: { name, email, phone, url_img } });
+		} catch (err) {
+			console.log(JSON.stringify(err));
 		}
 	}
 };

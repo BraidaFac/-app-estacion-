@@ -9,16 +9,18 @@
 		<img alt="logo" height="40px" width="40px" src="/logo.jpg" />
 		<a href="/">La estacion</a>
 	</div>
-	{#if data.user}
+	{#if data.user?.rol === 'ADMIN'}
+		<a href="/admin">Acciones</a>
+		<a class="go_back" href="./">Volver</a>
+	{:else if data.user?.rol === 'USER'}
 		<ul>
 			<li><a href="/add">Nuevo</a></li>
-			<li><a href="/files">Excel</a></li>
-			<li><a href="/price/upprice">Actualizar precios</a></li>
+			<li><a href="/price">Actualizar precios</a></li>
 		</ul>
 	{/if}
 	<div class="usr-menu">
 		{#if data.user}
-			<li>{data.user?.name}</li>
+			<li>{data.user?.username}</li>
 		{/if}
 		<details class="menu" role="list">
 			<summary aria-haspopup="listbox">
@@ -48,6 +50,9 @@
 </div>
 
 <style lang="scss">
+	.go_back {
+		color: red;
+	}
 	.main {
 		padding: 15px;
 	}

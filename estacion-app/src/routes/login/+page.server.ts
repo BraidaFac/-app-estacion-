@@ -1,5 +1,5 @@
 import { auth } from '$lib/server/lucia';
-import { LuciaError } from 'lucia-auth';
+import { LuciaError } from 'lucia';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -19,14 +19,13 @@ export const actions: Actions = {
 		try {
 			const user = await auth.useKey('username', username, password);
 			const session = await auth.createSession({ userId: user.userId, attributes: {} });
-			//const sessionCookie = auth.createSessionCookie(session).serialize();
 			locals.auth.setSession(session);
 
 			redirect(304, '/');
 		} catch (err) {
 			if (err instanceof LuciaError) {
 				return {
-					email: username,
+					user: username,
 					message: err.message
 				};
 			}

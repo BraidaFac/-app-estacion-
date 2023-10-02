@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { invalidate, invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 	export let data: PageData;
 
@@ -8,24 +7,33 @@
 	const brands = data.brands;
 </script>
 
-<div class="container">
+<div class="container-fluid grid">
 	<div class="">
-		<form
-			use:enhance={() => {
-				return async ({ update, result }) => {
-					if (result.type === 'success') {
-						update();
-						alert('Se agrego el producto');
-					} else {
-						alert('Error al agregar el producto');
-					}
-				};
-			}}
-			action="?/product"
-			method="POST"
-		>
+		<form use:enhance action="?/brand" method="POST">
+			<label for="brand">Marca</label>
+			<input type="text" name="brand" id="brand" />
+			<label for="email">Email</label>
+			<input type="text" name="email" id="email" />
+			<label for="phone">Numero de telefono</label>
+			<input type="text" name="phone" id="phone" />
+			<label for="url_img">URL de la imagen</label>
+			<input type="text" name="url_img" id="url_img" />
+			<button type="submit">Agregar</button>
+		</form>
+	</div>
+	<div class="">
+		<form use:enhance action="?/category" method="POST">
+			<label for="category">Categoria</label>
+			<input type="text" name="name" id="category" />
+			<button type="submit">Agregar</button>
+		</form>
+	</div>
+	<div class="">
+		<form action="?/product" method="POST">
 			<label for="article">Articulo</label>
 			<input type="text" name="article" id="article" />
+			<label for="name">Nombre</label>
+			<input type="text" name="name" id="name" />
 			<select name="category_id">
 				<option selected disabled value="">Selecciona una categoria</option>
 				{#each categories as cat (cat.id)}
@@ -40,36 +48,9 @@
 			</select>
 			<label for="price">Precio</label>
 			<input type="number" name="price" id="price" />
-
 			<label for="description">Descripcion</label>
 			<textarea name="description" id="description" />
-			<div class="btn-actions">
-				<button type="submit">Agregar</button>
-			</div>
+			<button type="submit">Agregar</button>
 		</form>
 	</div>
 </div>
-
-<style lang="scss">
-	.btn-actions {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		button {
-			margin-right: 1rem;
-			width: 40%;
-			height: 3rem;
-		}
-		a {
-			background-color: rgb(162, 2, 2);
-			border-color: rgb(162, 2, 2);
-			width: 40%;
-			margin-left: 1rem;
-			height: 3rem;
-		}
-		a:hover {
-			background-color: rgb(255, 0, 0);
-			border-color: rgb(255, 0, 0);
-		}
-	}
-</style>

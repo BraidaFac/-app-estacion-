@@ -36,23 +36,14 @@
 						<span class="error">{form?.errors?.user[0]}</span>
 					{/if}
 					<input
-						type="text"
-						name="name"
-						placeholder="Name"
-						aria-label="Name"
-						class={form?.errors?.name ? 'input-error' : 'input'}
-						value={form?.data?.name ?? ''}
-					/>
-					{#if form?.errors?.name}
-						<span class="error">{form?.errors?.name[0]}</span>
-					{/if}
-					<input
 						type="password"
 						name="password"
 						placeholder="Password"
 						aria-label="Password"
 						autocomplete="current-password"
-						class={form?.errors?.password ? 'input-error' : 'input'}
+						class={form?.errors?.password || form?.errors?.confirmPassword
+							? 'input-error'
+							: 'input'}
 						value={form?.data?.password ?? ''}
 					/>
 					{#if form?.errors?.password}
@@ -85,58 +76,26 @@
 </main>
 
 <style lang="scss">
-	.container {
-		display: flex;
-		height: 40rem;
-		justify-content: center;
-		padding: 2rem 0;
-		align-items: flex-start;
-		z-index: 0;
-		.grid {
-			.form-panel {
-				display: flex;
-				justify-content: space-between;
-				align-items: space-between;
-				flex-direction: column;
-				height: 100%;
-				h1 {
-					font-size: 2rem;
-				}
-			}
+	article {
+		height: 70%;
+	}
+	.inputs {
+		input {
+			margin-bottom: 1rem;
 		}
 	}
-	.mt-1 {
-		margin-top: 1rem;
+	.container {
+		height: calc(100vh - 80px);
+		.grid {
+			margin-top: 60px;
+		}
 	}
 	#logo {
 		background-image: url('logo.jpg');
 		background-position: center;
 		background-size: cover;
 	}
-	.register-form {
-		--form-element-spacing-vertical: 0.5rem;
-		display: flex;
-		justify-content: space-between;
-		flex-direction: column;
-		margin-bottom: 0;
-		.inputs {
-			height: 25rem;
-			.input {
-				display: inline-block;
-				--spacing: 0;
-				margin-bottom: 2rem;
-			}
-			.input:first-child {
-				margin-top: 1rem;
-			}
-			.message-error {
-				margin-bottom: 1rem;
-			}
-		}
-		.submit-btn {
-			margin-bottom: 0;
-		}
-	}
+
 	.error {
 		font-size: small;
 		color: red;

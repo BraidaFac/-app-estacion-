@@ -1,10 +1,10 @@
 <script lang="ts">
-	export let src: string;
-	export let name: string;
+	export let url_img: string;
+	export let route: string;
 </script>
 
-<a href="/{name}">
-	<img {src} alt="" width="200" height="300" />
+<a href="/{route}">
+	<img src={url_img} alt="" width="200" height="300" />
 </a>
 
 <style>

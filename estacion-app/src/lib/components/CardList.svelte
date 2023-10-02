@@ -1,17 +1,15 @@
 <script lang="ts">
 	import { dataImg } from '$lib/data/brandImg';
+	import type { Brand } from '../../types';
 	import Card from './Card.svelte';
-	import HeaderList from './HeaderList.svelte';
+	export let brands: Brand[];
 </script>
 
 <div class="list">
-	<div class="header">
-		<slot {HeaderList} />
-	</div>
 	<div class="content">
-		{#each dataImg as img}
+		{#each brands as brand}
 			<Card let:CardImg>
-				<CardImg {...img} />
+				<CardImg route={brand.name} url_img={brand.url_img} />
 			</Card>
 		{/each}
 	</div>

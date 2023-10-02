@@ -1,13 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
-import { readFile } from '$lib/data/filesUpload';
-import { writeFileSync } from 'fs';
-import { read } from 'xlsx';
+import { readfile } from '$lib/data/filesUpload';
+import { writeFileSync, unlink } from 'fs';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth.validate();
-	if (!session) {
+	if (!session || session?.user.rol !== 'ADMIN') {
 		throw redirect(302, '/');
 	}
 };
@@ -25,10 +24,19 @@ export const actions: Actions = {
 
 		const { file } = formData as { file: File };
 		// Write the file to the static folder
-		// writeFileSync(`static/${file.name}`, Buffer.from(await file.arrayBuffer()));
-		readFile();
-		return {
-			success: true
-		};
+		try {
+			writeFileSync(`static/archivo.xlsx`, Buffer.from(await file.arrayBuffer()));
+			await readfile();
+			unlink(`static/archivo.xlsx`, (err) => {
+				if (err) {
+					console.log(err);
+				}
+			});
+			return {
+				success: true
+			};
+		} catch (error) {
+			return fail(404, { error });
+		}
 	}
 };

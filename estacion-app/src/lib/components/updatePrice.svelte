@@ -4,16 +4,16 @@
 	import type { Writable } from 'svelte/store';
 	import type { SearchStoreModel } from '../../stores/stores';
 
+	export let show_new_form_modal: boolean; // boolean
+	let dialog: HTMLDialogElement; // HTMLDialogElement
+	$: if (dialog && show_new_form_modal) dialog.showModal();
 	export let product: Product;
 	export let searchStore: Writable<SearchStoreModel<Product>>;
 	let disabled: boolean = true;
-	let newPrice: string = product.price[0].price.toString();
-	$: disabled = parseInt(newPrice) === product.price[0].price;
-	const dispatch = createEventDispatcher();
+	let oldPrice: string = product.price[0].price.toString();
+	let newPrice: string = '';
+	$: disabled = parseInt(oldPrice) === parseInt(newPrice);
 
-	function close() {
-		dispatch('close');
-	}
 	async function submit(e: Event) {
 		const formData = new FormData(e.target as HTMLFormElement);
 		const price: string = formData.get('price') as string;
@@ -42,23 +42,31 @@
 							}
 							return prod;
 						});
-						close();
+						dialog.close();
 					}
 				});
 		} else {
-			close();
+			dialog.close();
 		}
 	}
 </script>
 
-<article>
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+<dialog
+	bind:this={dialog}
+	on:close={() => (show_new_form_modal = false)}
+	on:click|self={() => dialog.close()}
+>
 	<div class="formPrice">
-		<a href="/" on:click|preventDefault={close}>X</a>
 		<form on:submit|preventDefault={submit}>
-			<label for="price">Articulo {product.id}</label>
+			<label for="price">Articulo: <span>{product.article}</span></label>
+			<label
+				>Precio actual:
+				<span>${oldPrice}</span>
+			</label>
 			<input
-				placeholder={product.price[0].price.toString()}
 				bind:value={newPrice}
+				placeholder="Nuevo Precio"
 				name="price"
 				id="price"
 				type="number"
@@ -68,48 +76,92 @@
 			{/if}
 			<div>
 				<button {disabled} type="submit">Enviar</button>
+				<a
+					role="button"
+					href="/"
+					on:click|preventDefault={() => {
+						dialog.close();
+					}}>Volver</a
+				>
 			</div>
 		</form>
 	</div>
-</article>
+</dialog>
 
 <style lang="scss">
-	article {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 30%;
-		background-color: rgba(95, 177, 255, 0.824);
-		padding: 1rem;
-		border-radius: 5px;
-		box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
-		z-index: 10;
-	}
 	.formPrice {
 		border-radius: 10px;
-		padding: 5px;
+		padding: 3rem;
 		display: flex;
-		justify-content: center;
+		justify-content: space-between;
 		flex-direction: column;
 		align-items: center;
-		height: 100%;
-		input {
-			width: 200px;
+		width: 50%;
+		span {
+			color: #ff0000;
+			font-weight: bolder;
 		}
+
 		a {
-			font-size: xx-large;
-			align-self: flex-end;
-			justify-self: flex-start;
+			display: block;
+			background-color: rgb(142, 0, 0);
+			border-color: rgb(142, 0, 0);
+			height: 3rem;
+			margin-left: 1rem;
+			width: 6rem;
 		}
-		button {
-			margin-top: 10px;
-			width: 100px;
+		a:hover {
+			background-color: #ff0000;
+			border-color: #ff0000;
 		}
 		div {
+			margin-top: 1rem;
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
+		}
+		button {
+			height: 3rem;
+			margin-right: 1rem;
+			width: 6rem;
+		}
+	}
+
+	dialog {
+		max-width: 32em;
+		border-radius: 0.2em;
+		border: none;
+		padding: 0;
+	}
+	dialog::backdrop {
+		background: rgba(0, 0, 0, 0.3);
+	}
+	dialog > div {
+		background: #11191f;
+		padding: 1em;
+		width: 30%;
+		border-radius: 10px;
+	}
+	dialog[open] {
+		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	@keyframes zoom {
+		from {
+			transform: scale(0.95);
+		}
+		to {
+			transform: scale(1);
+		}
+	}
+	dialog[open]::backdrop {
+		animation: fade 0.2s ease-out;
+	}
+	@keyframes fade {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
 		}
 	}
 </style>

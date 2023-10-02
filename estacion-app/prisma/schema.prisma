@@ -11,7 +11,7 @@ datasource db {
 }
 model AuthUser {
   id String @id @map("_id")
-  name String 
+  rol String
   username String @unique
   auth_session AuthSession[]
   auth_key     AuthKey[]
@@ -46,7 +46,7 @@ model AuthKey {
 
 model Product {
   id String @id @map("_id")@default(auto()) @db.ObjectId
-  article String? @unique
+  article String? 
   price Price[]
   description String?
   category_id  String @db.ObjectId
@@ -69,6 +69,7 @@ model Brand {
   product Product[]
   email String?
   phone String?
+  url_img String
   
   @@map("brands")
 }

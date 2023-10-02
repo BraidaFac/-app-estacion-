@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
+import type { PageServerLoad } from './$types';
 import { prismaClient } from '$lib/server/prisma';
 import type { Product } from '../../types';
 
@@ -9,7 +9,7 @@ export const load: PageServerLoad = (async ({ params, locals }) => {
 		throw redirect(302, '/');
 	}
 	return {
-		products: (await prismaClient.product.findMany({
+		products: await prismaClient.product.findMany({
 			where: {
 				brand: {
 					name: params.brand
@@ -34,7 +34,7 @@ export const load: PageServerLoad = (async ({ params, locals }) => {
 					name: 'asc'
 				}
 			}
-		})) as Product[],
+		}),
 		categories: await prismaClient.category.findMany()
 	};
 }) satisfies PageServerLoad;

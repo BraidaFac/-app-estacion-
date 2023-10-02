@@ -5,7 +5,7 @@ export interface SearchStoreModel<T extends Record<PropertyKey, any>> {
 	filtered: T[];
 	search: string;
 	category?: string;
-	brand?: string;
+	description?: string;
 }
 
 export const createSearchStore = <T extends Record<PropertyKey, any>>(data: T[]) => {
@@ -14,7 +14,7 @@ export const createSearchStore = <T extends Record<PropertyKey, any>>(data: T[])
 		filtered: data,
 		search: '',
 		category: '',
-		brand: ''
+		description: ''
 	});
 
 	return {
@@ -27,13 +27,13 @@ export const createSearchStore = <T extends Record<PropertyKey, any>>(data: T[])
 export const searchHandler = <T extends Record<PropertyKey, any>>(store: SearchStoreModel<T>) => {
 	{
 		const searchCat = store.category?.toLowerCase() || '';
-		const searchBrand = store.brand?.toLowerCase() || '';
 		const searchTerm = store.search.toLowerCase() || '';
+		const searchDescription = store.description?.toLowerCase() || '';
 		store.filtered = store.data.filter((item) => {
 			return (
 				item.searchTerms.toLowerCase().includes(searchCat) &&
-				item.searchTerms.toLowerCase().includes(searchBrand) &&
-				item.searchTerms.toLowerCase().includes(searchTerm)
+				item.searchTerms.toLowerCase().includes(searchTerm) &&
+				item.searchTerms.toLowerCase().includes(searchDescription)
 			);
 		});
 	}

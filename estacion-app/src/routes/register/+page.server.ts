@@ -1,43 +1,9 @@
 import { auth } from '$lib/server/lucia';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { z } from 'zod';
+import { registerSchema } from './registerSchema';
 import { ZodError } from 'zod';
 import { generateRandomString } from 'lucia/utils';
-
-const registerSchema = z
-	.object({
-		name: z
-			.string({ required_error: 'Ingrese su nombre' })
-			.min(1, { message: 'Ingrese su nombre' })
-			.max(50, { message: 'Ingrese hasta 50 caracteres' })
-			.trim(),
-		username: z
-			.string({ required_error: 'Ingrese su nombre de usuario' })
-			.min(1, { message: 'Ingrese su nombre de usuario' })
-			.max(20, {
-				message: 'El nombre de usuario puede tener hasta 20 caracteres'
-			}),
-		password: z
-			.string({ required_error: 'Ingrese su contraseña' })
-			.min(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
-			.max(20, { message: 'La contraseña puede tener hasta 20 caracteres' })
-			.trim(),
-		confirmPassword: z
-			.string({ required_error: 'Confirme su contraseña' })
-			.min(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
-			.max(20, { message: 'La contraseña puede tener hasta 20 caracteres' })
-			.trim()
-	})
-	.superRefine(({ password, confirmPassword }, context) => {
-		if (password !== confirmPassword) {
-			context.addIssue({
-				code: 'custom',
-				message: 'Las contraseñas no coinciden',
-				path: ['confirmPassword']
-			});
-		}
-	});
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth.validate();
@@ -60,7 +26,7 @@ export const actions: Actions = {
 				},
 				attributes: {
 					username: result.username,
-					name: result.name
+					rol: 'USER'
 				}
 			});
 		} catch (error) {
@@ -71,9 +37,8 @@ export const actions: Actions = {
 					errors
 				};
 			} else {
-				console.log(error);
 				return {
-					message: 'No se pudo registrar al usuario'
+					message: 'El usuario ya existe'
 				};
 			}
 		}

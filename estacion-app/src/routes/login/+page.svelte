@@ -7,7 +7,7 @@
 
 <main class="container">
 	<article class="grid">
-		<div>
+		<div class="form-panel">
 			<hgroup>
 				<h1>Login</h1>
 			</hgroup>
@@ -21,20 +21,15 @@
 					};
 				}}
 			>
-				{#if form?.message === 'AUTH_INVALID_KEY_ID'}
-					<span class="error">Usuario incorrecto</span>
-				{/if}
 				<input
-					value={form?.email ?? ''}
+					value={form?.user ?? ''}
 					type="text"
 					name="username"
 					placeholder="Username"
 					aria-label="Username"
 					required
 				/>
-				{#if form?.message === 'AUTH_INVALID_PASSWORD'}
-					<span class="error">Clave incorrecta</span>
-				{/if}
+
 				<input
 					type="password"
 					name="password"
@@ -43,11 +38,13 @@
 					autocomplete="current-password"
 					required
 				/>
-
+				{#if form?.message === 'AUTH_INVALID_KEY_ID' || form?.message === 'AUTH_INVALID_PASSWORD'}
+					<span class="error">Credenciales incorrectas</span>
+				{/if}
 				<button type="submit" class="contrast" typeof="submit" aria-busy={loading}>Log in</button>
 			</form>
 
-			<p>No tienes una cuenta <a href="/register">Register</a></p>
+			<p>No tienes una cuenta <a href="/register">Registrarse</a></p>
 		</div>
 		<div id="logo" />
 	</article>
