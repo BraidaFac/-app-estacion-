@@ -25,11 +25,11 @@ export const actions: Actions = {
 		const { file } = formData as { file: File };
 		// Write the file to the static folder
 		try {
-			writeFileSync(`static/archivo.xlsx`, Buffer.from(await file.arrayBuffer()));
+			writeFileSync(`../../../static/archivo.xlsx`, Buffer.from(await file.arrayBuffer()));
 			await readfile();
-			unlink(`static/archivo.xlsx`, (err) => {
+			unlink(`../../../static/archivo.xlsx`, (err) => {
 				if (err) {
-					console.log(err);
+					return fail(404, { error: err });
 				}
 			});
 			return {
