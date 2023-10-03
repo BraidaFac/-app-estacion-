@@ -62,7 +62,7 @@
 		color: red;
 	}
 	#logo {
-		background-image: url('logo.jpg');
+		background-image: url('../../../static/logo.jpg');
 		background-position: center;
 		background-size: contain;
 	}
