@@ -17,7 +17,7 @@ export const actions: Actions = {
 			string
 		>;
 		try {
-			const user = await auth.useKey('username', username, password);
+			const user = await auth.useKey('username', username.toLowerCase(), password);
 			const session = await auth.createSession({ userId: user.userId, attributes: {} });
 			locals.auth.setSession(session);
 
