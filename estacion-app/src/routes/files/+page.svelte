@@ -10,7 +10,7 @@
 	<div class="files-form">
 		<h1>Files</h1>
 		<form
-			method="post"
+			method="POST"
 			use:enhance={() => {
 				loading = true;
 				return async ({ result, update }) => {
@@ -20,8 +20,8 @@
 						alert('Archivo subido correctamente');
 					} else {
 						loading = false;
-						const errors = result.data.error.error.join('\n');
-						alert(errors + '\n' + 'Intente nuevamente');
+						//const errors = result.data.error.error.join('\n');
+						//alert(errors + '\n' + 'Intente nuevamente');
 					}
 				};
 			}}

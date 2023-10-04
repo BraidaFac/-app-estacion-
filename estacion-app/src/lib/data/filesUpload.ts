@@ -1,6 +1,5 @@
 import { prismaClient } from '$lib/server/prisma';
 import type { Product } from '@prisma/client';
-import fs from 'fs';
 import readXlsxFile, { readSheetNames, type Row } from 'read-excel-file/node';
 
 enum arrayIndex {
@@ -10,25 +9,20 @@ enum arrayIndex {
 	DESCRIPCION = 3,
 	PRECIO = 4
 }
-export async function readfile(): Promise<void> {
-	const sheetNames = await readSheetNames(
-		`D:\\Escritorio\\estacion-app\\estacion-app\\static\\archivo.xlsx`
-	);
+export async function readfile(url: string): Promise<void> {
+	const sheetNames = await readSheetNames(url);
 
 	// Procesa las primeras 3 hojas (índices 0, 1 y 2)
 
 	for (let i = 0; i < sheetNames.length; i++) {
-		await processSheet(sheetNames[i]);
+		await processSheet(sheetNames[i], url);
 	}
 }
 
-async function processSheet(sheetName: any): Promise<void> {
-	const rows = await readXlsxFile(
-		'D:\\Escritorio\\estacion-app\\estacion-app\\static\\archivo.xlsx',
-		{
-			sheet: sheetName
-		}
-	);
+async function processSheet(sheetName: any, url: string): Promise<void> {
+	const rows = await readXlsxFile(url, {
+		sheet: sheetName
+	});
 
 	const new_old_object = searchNewProduct(rows.slice(2), await getAllProducts());
 	const responseObj: { error: string[]; status: number } = { error: [], status: 200 };
@@ -81,7 +75,7 @@ async function processOldProducts(
 			const row = sheet[i];
 			await prismaClient.product.update({
 				where: {
-					id: row[arrayIndex.ARTICULO] ? row[arrayIndex.ARTICULO].toString() : '-'
+					id: row[arrayIndex.ARTICULO].toString()
 				},
 				data: {
 					price: {
@@ -134,9 +128,9 @@ async function processNewProducts(
 				responseObj.status = 404;
 				break;
 			} else {
-				const product = await prismaClient.product.create({
+				await prismaClient.product.create({
 					data: {
-						article: row[arrayIndex.ARTICULO] ? row[arrayIndex.ARTICULO].toString() : '-',
+						article: row[arrayIndex.ARTICULO].toString(),
 						brand_id: brand.id,
 						category_id: category.id,
 						description: row[arrayIndex.DESCRIPCION] ? row[arrayIndex.DESCRIPCION].toString() : '-',
@@ -149,10 +143,8 @@ async function processNewProducts(
 						}
 					}
 				});
-				console.log(product);
 			}
 		} catch (err) {
-			console.log(err);
 			responseObj.error.push('Prisma error');
 			responseObj.status = 404;
 		}

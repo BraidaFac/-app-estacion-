@@ -7,7 +7,7 @@
 	<a role="button" href="admin/brand">Marcas</a>
 	<a role="button" href="admin/category">Categorias</a>
 	<a role="button" href="admin/product">Articulos</a>
-	<a role="button" href="admin/files">Excel</a>
+	<a role="button" href="files">Excel</a>
 </div>
 
 <style lang="scss">

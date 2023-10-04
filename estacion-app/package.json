@@ -39,6 +39,7 @@
 		"@picocss/pico": "^1.5.10",
 		"@prisma/client": "^4.2.0",
 		"@types/formidable": "^3.4.0",
+		"@vercel/blob": "^0.13.0",
 		"formidable": "^3.5.0",
 		"formidable-serverless": "^1.1.1",
 		"lucia-auth": "^1.8.0",
