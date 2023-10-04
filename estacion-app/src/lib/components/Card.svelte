@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import type { Brand, Category } from '../../types';
 	import CardImg from './CardImg.svelte';
 </script>
 

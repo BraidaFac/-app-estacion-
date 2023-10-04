@@ -6,7 +6,7 @@
 </script>
 
 <div class="list">
-	<h1>{`Articulo:  ${product?.id}`}</h1>
+	<h1>{`Articulo:  ${product?.article}`}</h1>
 	<table class="t-price" role="grid">
 		<thead>
 			<tr>

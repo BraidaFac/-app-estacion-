@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let url_img: string;
+	export let url_img: string | undefined;
 	export let route: string;
 </script>
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { dataImg } from '$lib/data/brandImg';
 	import type { Brand } from '../../types';
 	import Card from './Card.svelte';
 	export let brands: Brand[];
