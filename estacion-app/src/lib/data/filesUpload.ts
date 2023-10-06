@@ -24,11 +24,11 @@ async function processSheet(sheetName: any, url: string): Promise<void> {
 		sheet: sheetName
 	});
 
-	const new_old_object = searchNewProduct(rows.slice(2), await getAllProducts());
+	const new_old_object = search_new_old_product(rows.slice(2), await getAllProducts());
 	const responseObj: { error: string[]; status: number } = { error: [], status: 200 };
 
 	if (new_old_object.oldProducts.length > 0) {
-		await processOldProducts(new_old_object.oldProducts, responseObj, sheetName);
+		await process_old_product(new_old_object.oldProducts, responseObj, sheetName);
 		if (responseObj.status === 404) {
 			responseObj.error.unshift('Error en la hoja ' + sheetName);
 			throw responseObj;
@@ -47,7 +47,7 @@ async function getAllProducts(): Promise<Product[]> {
 	const products = await prismaClient.product.findMany();
 	return products;
 }
-function searchNewProduct(rows: Row[], products: Product[]) {
+function search_new_old_product(rows: Row[], products: Product[]) {
 	const newProducts: Row[] = [];
 	const oldProducts: Row[] = [];
 	rows.forEach((row) => {
@@ -63,7 +63,7 @@ function searchNewProduct(rows: Row[], products: Product[]) {
 	return { newProducts, oldProducts };
 }
 
-async function processOldProducts(
+async function process_old_product(
 	sheet: Row[],
 	responseObj: { error: string[]; status: number },
 	sheetName: string

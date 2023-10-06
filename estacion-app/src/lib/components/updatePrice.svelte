@@ -58,6 +58,7 @@
 	on:click|self={() => dialog.close()}
 >
 	<div class="formPrice">
+		<h3>Modificar precio</h3>
 		<form on:submit|preventDefault={submit}>
 			<label for="price">Articulo: <span>{product.article}</span></label>
 			<label
@@ -75,7 +76,7 @@
 				<span style=" display:block; color:red; font-size:small">Tiene el mismo precio</span>
 			{/if}
 			<div>
-				<button {disabled} type="submit">Enviar</button>
+				<button {disabled} type="submit">Cambiar</button>
 				<a
 					role="button"
 					href="/"
@@ -96,9 +97,9 @@
 		justify-content: space-between;
 		flex-direction: column;
 		align-items: center;
-		width: 50%;
+		width: 30%;
 		span {
-			color: #ff0000;
+			color: rgb(142, 0, 0);
 			font-weight: bolder;
 		}
 

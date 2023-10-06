@@ -26,4 +26,10 @@
 			box-shadow: 2px 6px 25px 20px rgba(rgb(248, 247, 247), 0.2);
 		}
 	}
+	@media (max-width: 600px) {
+		.card {
+			width: 100%;
+			height: 200px;
+		}
+	}
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
 	export let data: PageData;
 	const prices = data.prices;
@@ -18,12 +19,20 @@
 			{#each prices as price (price.id)}
 				<tr>
 					<td>${price.price}</td>
-					<td>{`${price.date.getDay()}/${price.date.getMonth()}/${price.date.getFullYear()}`}</td>
+					<td>{`${price.date.toISOString().split('T')[0]}`}</td>
 				</tr>
 			{/each}
 		</tbody>
 	</table>
-	<a role="button" href="/">Volver a la lista</a>
+	<a
+		href="/"
+		role="button"
+		on:click|preventDefault={() => {
+			if (browser) {
+				history.back();
+			}
+		}}>Volver a la lista</a
+	>
 </div>
 
 <style lang="scss">

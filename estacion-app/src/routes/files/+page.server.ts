@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
-import { readfile } from '$lib/data/filesUpload';
+//import { readfile } from '$lib/data/filesUpload';
 import { writeFileSync, unlink } from 'fs';
 import { put } from '@vercel/blob';
 
@@ -24,11 +24,13 @@ export const actions: Actions = {
 		}
 
 		const { file } = formData as { file: File };
+
+		//readFile(file);
 		// Write the file to the static folder
 		try {
 			//writeFileSync(`static/archivo.xlsx`, Buffer.
 			//from(await file.arrayBuffer()));
-			const { url } = await put(file.name, file, { access: 'public' });
+			//const { url } = await put(file.name, file, { access: 'public' });
 
 			//await readfile();
 			/* unlink(`static/archivo.xlsx`, (err) => {
@@ -38,8 +40,8 @@ export const actions: Actions = {
 				}
 			}); */
 			return {
-				status: 200,
-				uploaded: url
+				status: 200
+				//	uploaded: url
 			};
 		} catch (error) {
 			console.log(error);

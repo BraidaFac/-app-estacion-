@@ -4,17 +4,18 @@
 	export let data: LayoutData;
 </script>
 
-<nav class=" navbar bg-white px-4">
+<nav class="navbar">
 	<div class="logo">
-		<img alt="logo" height="40px" width="40px" src="/logo.jpg" />
-		<a href="/">La estacion</a>
+		<a href="/"
+			><img alt="logo" height="40px" width="40px" src="/logo.jpg" /><span> La estacion</span></a
+		>
 	</div>
 	{#if data.user?.rol === 'ADMIN'}
 		<a href="/admin">Acciones</a>
 		<a class="go_back" href="./">Volver</a>
 	{:else if data.user?.rol === 'USER'}
-		<ul>
-			<li><a href="/add">Nuevo</a></li>
+		<ul id="user_actions">
+			<li><a href="/add">Nuevo articulo</a></li>
 			<li><a href="/price">Actualizar precios</a></li>
 		</ul>
 	{/if}
@@ -138,5 +139,46 @@
 	.a:focus {
 		cursor: pointer;
 		outline: none;
+	}
+
+	@media only screen and (max-width: 600px) {
+		.navbar {
+			display: flex;
+			justify-content: space-between;
+			#user_actions {
+				display: none;
+			}
+			.logo {
+				a {
+					span {
+						display: none;
+					}
+				}
+			}
+			.usr-menu {
+				padding: 1px;
+				.menu {
+					.listbox {
+						left: -4.5rem;
+						width: 8rem;
+						form {
+							margin: 0;
+							display: flex;
+							align-items: center;
+							padding-bottom: 5px;
+							button li {
+								margin: 5px 0 0 0;
+								top: 15px;
+								width: 8rem;
+								text-align: left;
+							}
+							button li:hover {
+								background-color: hsl(205, 20%, 94%);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 </style>

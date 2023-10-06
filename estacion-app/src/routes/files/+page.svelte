@@ -19,7 +19,7 @@
 						update();
 						loading = false;
 						alert('Archivo subido correctamente');
-						alert(form?.uploaded);
+						//alert(form?.uploaded);
 					} else {
 						loading = false;
 						//const errors = result.data.error.error.join('\n');
@@ -30,7 +30,6 @@
 			enctype="multipart/form-data"
 		>
 			<label for="file">Archivo</label>
-			<p>{form?.uploaded}</p>
 			<input bind:value={file} type="file" name="file" id="file" accept=".xlsx, .xls" />
 			<div>
 				<button disabled={!file} type="submit">Agregar</button>

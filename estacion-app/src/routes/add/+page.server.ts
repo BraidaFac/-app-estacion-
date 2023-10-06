@@ -24,11 +24,13 @@ export const actions: Actions = {
 			description: string;
 		};
 		try {
+			const date = new Date();
+			date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 			await prismaClient.product.create({
 				data: {
 					article,
 					price: {
-						create: { price: Number(price), date: new Date().toISOString(), current_price: true }
+						create: { price: Number(price), date: date.toISOString(), current_price: true }
 					},
 					category_id,
 					brand_id,

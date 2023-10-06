@@ -118,4 +118,36 @@
 			}
 		}
 	}
+
+	@media only screen and (max-width: 600px) {
+		.filters {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			align-items: flex-start;
+			input {
+				width: 100%;
+			}
+			select {
+				width: 100%;
+				border-radius: 5rem;
+			}
+		}
+
+		.list {
+			overflow-x: auto;
+
+			table {
+				tr {
+					th {
+						text-align: center;
+						color: rgb(159, 16, 16);
+					}
+					td {
+						text-align: center;
+					}
+				}
+			}
+		}
+	}
 </style>
