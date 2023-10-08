@@ -7,89 +7,100 @@ type Format = {
 	DESCRIPCION?: string;
 	PRECIO: string | number;
 };
-const brands = await prismaClient.brand.findMany();
-const categories = await prismaClient.category.findMany();
-const products = await prismaClient.product.findMany();
-const newProducts: Format[] = [];
-const oldProducts: Format[] = [];
+
 export const POST = async ({ request }) => {
 	const responseObj: { error: string[]; status: number } = { error: [], status: 200 };
 	try {
-		const data = await request.json();
-		const array_data: Array<Array<Format>> = [...data];
-		for (const sheet of array_data) {
-			console.log(searchNewProduct(sheet));
-			await processOldProducts(oldProducts, responseObj);
+		const data = (await request.json()) as Format[][];
+		if (data.length === 0) {
+			return new Response(JSON.stringify({ error: 'No hay datos.' }));
 		}
-		return new Response(JSON.stringify(responseObj), {
-			status: responseObj.error.length === 0 ? 200 : 404
-		});
-	} catch (err) {
-		return new Response(JSON.stringify({ error: 'Error interno del servidor.' }), {
-			status: 500
-		});
+		sanatizaceSheet(data, responseObj);
+
+		if (responseObj.error.length > 0) {
+			return new Response(
+				JSON.stringify({
+					error: responseObj.error,
+					status: responseObj.status
+				})
+			);
+		}
+		for (const sheet of data) {
+			await processProducts(sheet);
+		}
+		return new Response(JSON.stringify({ status: 200, success: true }));
+	} catch (error) {
+		console.log(error);
+		return new Response(
+			JSON.stringify({ status: 500, error: 'Error No se encontro marca o catetgoria' })
+		);
 	}
 };
 
-function searchNewProduct(sheet: Format[]): Format[] {
-	sheet.forEach((row) => {
-		const product = products.find((product) => product.article === row.ARTICULO?.toString());
-		if (product) {
-			oldProducts.push(row);
-			return;
-		}
-		newProducts.push(row);
+async function processProducts(sheet: Format[]) {
+	const brandName = sheet[0].MARCA;
+	const categoryName = sheet[0].CATEGORIA;
+	const date = new Date();
+	date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+	const category = await prismaClient.category.findMany({
+		where: { name: { equals: categoryName.toLowerCase(), mode: 'insensitive' } }
 	});
-	return newProducts;
-}
-async function processOldProducts(
-	sheet: Format[],
-	responseObj: { error: string[]; status: number }
-) {
+	const brand = await prismaClient.brand.findMany({
+		where: { name: { equals: brandName.toLowerCase(), mode: 'insensitive' } }
+	});
+	if (category.length === 0 || brand.length === 0) {
+		throw new Error('No se encontro la categoria o la marca');
+	}
 	for (let i = 0; i < sheet.length; i++) {
-		try {
-			const row = sheet[i];
-			const category = categories.find(
-				(cat) => cat.name.toLowerCase() === row.CATEGORIA.toLowerCase()
-			);
-			const brand = brands.find((brand) => brand.name.toLowerCase() === row.MARCA.toLowerCase());
-			console.log(category, row.CATEGORIA.toLowerCase());
-			if (!brand) {
-				responseObj.error.push(`Error en marca.` + row.MARCA + 'hoja:' + i + 1);
-				responseObj.status = 404;
-				break;
-			} else if (!category) {
-				responseObj.error.push(`Error en categoria. ` + row.CATEGORIA + 'hoja:' + (i + 1));
-				responseObj.status = 404;
-				break;
-			} else {
-				await prismaClient.product.update({
-					where: {
-						article: row.ARTICULO ? row.ARTICULO.toString() : '-'
-					},
-					data: {
-						price: {
-							updateMany: {
-								where: {
-									current_price: true
-								},
-								data: {
-									current_price: false
-								}
-							},
-							create: {
-								price: Number(row.PRECIO),
-								date: new Date().toISOString(),
-								current_price: true
-							}
+		const row = sheet[i];
+		if (row.ARTICULO === undefined) throw new Error('No se encontro el articulo');
+		await prismaClient.product.upsert({
+			where: {
+				article: row.ARTICULO.toString()
+			},
+			update: {
+				price: {
+					updateMany: {
+						where: {
+							current_price: true
+						},
+						data: {
+							current_price: false
 						}
+					},
+					create: {
+						price: Number(row.PRECIO),
+						date: date.toISOString(),
+						current_price: true
 					}
-				});
+				}
+			},
+			create: {
+				article: row.ARTICULO.toString(),
+				price: {
+					create: {
+						price: Number(row.PRECIO),
+						date: date.toISOString(),
+						current_price: true
+					}
+				},
+				category_id: category[0].id,
+				brand_id: brand[0].id,
+				description: row?.DESCRIPCION ?? 'No tiene'
 			}
-		} catch (err) {
-			console.log(err);
-			responseObj.error.push('Prisma error');
-			responseObj.status = 404;
+		});
+	}
+}
+function sanatizaceSheet(sheets: Format[][], responseObj: { error: string[]; status: number }) {
+	sheets.forEach((sheet, i) => {
+		for (const row of sheet) {
+			if (!row.ARTICULO || !row.MARCA || !row.CATEGORIA || !row.PRECIO) {
+				responseObj.error.push('Error en la hoja ' + (i + 1));
+				break;
+			}
 		}
+	});
+	if (responseObj.error.length > 0) {
+		responseObj.status = 404;
 	}
 }

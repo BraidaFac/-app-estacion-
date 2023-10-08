@@ -1,33 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import RingLoader from 'svelte-loading-spinners/RingLoader.svelte';
+	import { submit, loading } from '$lib/utils/excel_methods';
 
 	$: file = null;
-	let loading: boolean = false;
 	export let form;
 </script>
 
-{#if !loading}
+{#if !$loading}
 	<div class="files-form">
 		<h1>Files</h1>
 		<form
-			method="POST"
-			use:enhance={() => {
-				loading = true;
-				return async ({ result, update }) => {
-					if (result.status === 200) {
-						update();
-						loading = false;
-						alert('Archivo subido correctamente');
-						//alert(form?.uploaded);
-					} else {
-						loading = false;
-						//const errors = result.data.error.error.join('\n');
-						//alert(errors + '\n' + 'Intente nuevamente');
-					}
-				};
+			on:submit|preventDefault={async (event) => {
+				await submit(event);
 			}}
-			enctype="multipart/form-data"
 		>
 			<label for="file">Archivo</label>
 			<input bind:value={file} type="file" name="file" id="file" accept=".xlsx, .xls" />

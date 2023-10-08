@@ -77,6 +77,9 @@
 				margin-left: 5px;
 				background-color: transparent;
 				color: rgb(190, 13, 13);
+				span {
+					padding: 10px;
+				}
 			}
 		}
 		.opt-menu {
